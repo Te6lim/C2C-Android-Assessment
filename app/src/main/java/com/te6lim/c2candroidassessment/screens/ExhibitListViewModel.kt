@@ -11,7 +11,15 @@ class ExhibitListViewModel(private val exhibitLoader: RestExhibitLoader) : ViewM
     val exhibitList: LiveData<List<Exhibit>>
         get() = _exhibitList
 
+    val errorOccurred = Transformations.map(_exhibitList) {
+        it.isEmpty()
+    }
+
     init {
+        refreshList()
+    }
+
+    fun refreshList() {
         viewModelScope.launch {
             _exhibitList.postValue(exhibitLoader.getExhibitList())
         }
