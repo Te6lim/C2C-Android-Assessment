@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.te6lim.c2candroidassessment.R
@@ -30,6 +31,8 @@ class ExhibitListAdapter : ListAdapter<Exhibit, ExhibitListAdapter.ExhibitViewHo
                     LayoutInflater.from(parent.context), R.layout.item_exhibit, parent, false
                 )
                 itemBinding.recyclerView.adapter = adapter
+                val snapHelper = LinearSnapHelper()
+                snapHelper.attachToRecyclerView(itemBinding.recyclerView)
                 return ExhibitViewHolder(itemBinding)
             }
 

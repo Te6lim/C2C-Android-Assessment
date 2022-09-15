@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.SnapHelper
 import com.te6lim.c2candroidassessment.MainActivity
 import com.te6lim.c2candroidassessment.R
 import com.te6lim.c2candroidassessment.databinding.FragmentListExhibitBinding
