@@ -13,7 +13,7 @@ import com.te6lim.c2candroidassessment.model.Exhibit
 class ExhibitListAdapter : ListAdapter<Exhibit, ExhibitListAdapter.ExhibitViewHolder>(DiffCallbacks) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExhibitViewHolder {
-        return ExhibitViewHolder.create(parent)
+        return ExhibitViewHolder.create(parent, ExhibitViewHolder.newAdapter())
     }
 
     override fun onBindViewHolder(holder: ExhibitViewHolder, position: Int) {
@@ -25,13 +25,15 @@ class ExhibitListAdapter : ListAdapter<Exhibit, ExhibitListAdapter.ExhibitViewHo
     ) : RecyclerView.ViewHolder(itemExhibitBinding.root) {
 
         companion object {
-            fun create(parent: ViewGroup): ExhibitViewHolder {
+            fun create(parent: ViewGroup, adapter: ExhibitItemListAdapter): ExhibitViewHolder {
                 val itemBinding: ItemExhibitBinding = DataBindingUtil.inflate(
                     LayoutInflater.from(parent.context), R.layout.item_exhibit, parent, false
                 )
-                itemBinding.recyclerView.adapter = ExhibitItemListAdapter()
+                itemBinding.recyclerView.adapter = adapter
                 return ExhibitViewHolder(itemBinding)
             }
+
+            fun newAdapter() = ExhibitItemListAdapter()
         }
 
         fun bind(exhibit: Exhibit) {
