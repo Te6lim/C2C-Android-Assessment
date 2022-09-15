@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Exhibits</string>
+    <string name="exhibit_list">exhibit list</string>
+    <string name="toolbar">Toolbar</string>
 </resources>

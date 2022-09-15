@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.te6lim.c2candroidassessment.MainActivity
 import com.te6lim.c2candroidassessment.R
 import com.te6lim.c2candroidassessment.databinding.FragmentListExhibitBinding
 import com.te6lim.c2candroidassessment.model.RestExhibitLoader
@@ -25,6 +26,8 @@ class ExhibitListFragment : Fragment() {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_list_exhibit, container, false
         )
+
+        (requireActivity() as MainActivity).setSupportActionBar(binding.exhibitToolbar)
 
         binding.lifecycleOwner = this
 
