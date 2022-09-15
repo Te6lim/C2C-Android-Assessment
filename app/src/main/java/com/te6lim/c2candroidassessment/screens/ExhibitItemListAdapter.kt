@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.te6lim.c2candroidassessment.R
 import com.te6lim.c2candroidassessment.databinding.ItemImageBinding
 
@@ -36,7 +37,11 @@ class ExhibitItemListAdapter :
         fun bind(imageUrl: String) {
             Glide.with(itemView.context)
                 .load(imageUrl)
-                .into(imageBinding.imageView2)
+                .apply(
+                    RequestOptions()
+                        .error(R.drawable.ic_broken_image)
+                        .placeholder(R.drawable.image_loading_spinner)
+                ).into(imageBinding.imageView2)
         }
     }
 
