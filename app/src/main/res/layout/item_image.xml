@@ -13,7 +13,9 @@
         android:layout_marginStart="@dimen/small_spacing"
         android:layout_marginTop="@dimen/small_spacing"
         android:layout_marginEnd="@dimen/small_spacing"
-        android:layout_marginBottom="@dimen/small_spacing">
+        android:layout_marginBottom="@dimen/small_spacing"
+        android:background="@drawable/image_item_background"
+        android:padding="1dp">
 
         <ImageView
             android:id="@+id/imageView2"
@@ -25,7 +27,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@drawable/IPhone_5S" />
+            tools:srcCompat="@drawable/iphone" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
