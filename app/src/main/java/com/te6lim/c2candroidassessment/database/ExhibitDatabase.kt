@@ -30,7 +30,7 @@ abstract class ExhibitDatabase : RoomDatabase() {
 interface ExhibitDao {
 
     @Query("SELECT * FROM exhibit")
-    fun getAll(): LiveData<List<DBExhibit>>
+    suspend fun getAll(): List<DBExhibit>
 
     @Insert
     suspend fun addAll(list: List<DBExhibit>): List<Long>

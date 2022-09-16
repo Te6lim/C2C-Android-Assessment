@@ -16,7 +16,9 @@ class ExhibitRepository(
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
-    private val dbExhibits = exhibitDatabase.exhibitDao.getAll()
+    private val dbExhibits = MutableLiveData<List<DBExhibit>>().apply {
+        scope.launch { postValue(exhibitDatabase.exhibitDao.getAll()) }
+    }
 
     private val networkData = MutableLiveData<List<NetworkExhibit>>()
 
@@ -41,7 +43,7 @@ class ExhibitRepository(
     }
 
     private fun fetchList(
-        dbData: LiveData<List<DBExhibit>>, networkData: MutableLiveData<List<NetworkExhibit>>
+        dbData: MutableLiveData<List<DBExhibit>>, networkData: MutableLiveData<List<NetworkExhibit>>
     ): LiveData<List<DBExhibit>> {
         val result = MediatorLiveData<List<DBExhibit>>()
 
@@ -64,7 +66,8 @@ class ExhibitRepository(
                 if (it.isNotEmpty()) {
                     exhibitDatabase.exhibitDao.clear()
                     exhibitDatabase.exhibitDao.addAll(it.toDatabaseExhibitList())
-                    result.removeSource(networkData)
+                    dbData.postValue(exhibitDatabase.exhibitDao.getAll())
+
                 } else {
                     if (dbData.value!!.isNotEmpty()) loadStateListener.onStateResolved(NetworkState.DONE)
                     else loadStateListener.onStateResolved(NetworkState.ERROR)

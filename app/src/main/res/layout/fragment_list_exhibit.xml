@@ -71,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="@string/unable_to_conect_please_retry"
+                android:text="@string/unable_to_connect_please_retry"
                 android:textColor="@color/primaryTextColor"
                 app:layout_constraintBottom_toTopOf="@+id/retry"
                 app:layout_constraintEnd_toEndOf="parent"
