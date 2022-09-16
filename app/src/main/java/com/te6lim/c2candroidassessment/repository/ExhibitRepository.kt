@@ -1,21 +1,20 @@
 package com.te6lim.c2candroidassessment.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import com.te6lim.c2candroidassessment.database.DBExhibit
 import com.te6lim.c2candroidassessment.database.ExhibitDatabase
 import com.te6lim.c2candroidassessment.network.NetworkExhibit
-import com.te6lim.c2candroidassessment.model.RestExhibitLoader
+import com.te6lim.c2candroidassessment.network.ExhibitApi
 import kotlinx.coroutines.*
+import java.lang.Exception
 
 class ExhibitRepository(
-    private val exhibitLoader: RestExhibitLoader, private val exhibitDatabase: ExhibitDatabase
-) {
+    private val network: ExhibitApi, private val exhibitDatabase: ExhibitDatabase,
+    private val loadStateListener: LoadStateListener
+) : ExhibitLoader {
 
     private val job = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.Default + job)
+    private val scope = CoroutineScope(Dispatchers.Main + job)
 
     private val dbExhibits = exhibitDatabase.exhibitDao.getAll()
 
@@ -23,24 +22,43 @@ class ExhibitRepository(
 
     val exhibitList = fetchList(dbExhibits, networkData)
 
+    enum class NetworkState {
+        DONE, LOADING, ERROR
+    }
+
+    override suspend fun getExhibitList(): List<NetworkExhibit> {
+        return try {
+            loadStateListener.onStateResolved(NetworkState.LOADING)
+            val response = getNetworkExhibitList()
+            loadStateListener.onStateResolved(NetworkState.DONE)
+            response
+        } catch (e: Exception) {
+            loadStateListener.onStateResolved(NetworkState.ERROR)
+            listOf()
+        }
+    }
+
     private fun fetchList(
-        dbData: LiveData<List<DBExhibit>?>, networkData: MutableLiveData<List<NetworkExhibit>>
+        dbData: LiveData<List<DBExhibit>>, networkData: MutableLiveData<List<NetworkExhibit>>
     ): LiveData<List<DBExhibit>> {
         val result = MediatorLiveData<List<DBExhibit>>()
 
         val dbObserver = Observer<List<DBExhibit>?> {
-            it?.let {
+            if (it.isNotEmpty()) {
+                loadStateListener.onStateResolved(NetworkState.DONE)
                 result.value = it
-            } ?: run {
+            } else {
                 scope.launch {
-                    networkData.postValue(exhibitLoader.getExhibitList())
+                    networkData.postValue(getNetworkExhibitList())
                 }
             }
         }
 
-        val networkObserver = Observer<List<NetworkExhibit>?> {
+        val networkObserver = Observer<List<NetworkExhibit>> {
             scope.launch {
-                exhibitDatabase.exhibitDao.addAll(it.toDatabaseExhibitList())
+                if (it.isNotEmpty()) {
+                    exhibitDatabase.exhibitDao.addAll(it.toDatabaseExhibitList())
+                }
             }
         }
 
@@ -49,11 +67,15 @@ class ExhibitRepository(
         return result
     }
 
+    private suspend fun getNetworkExhibitList(): List<NetworkExhibit> {
+        return network.retrofitService.getExhibitsAsync().await()
+    }
+
     fun refreshList() {
         scope.launch {
             withContext(Dispatchers.IO) {
                 exhibitDatabase.exhibitDao.clear()
-                networkData.value = exhibitLoader.getExhibitList()
+                networkData.value = getNetworkExhibitList()
             }
         }
 

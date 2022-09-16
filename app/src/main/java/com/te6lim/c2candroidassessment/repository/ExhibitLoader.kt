@@ -1,4 +1,4 @@
-package com.te6lim.c2candroidassessment.model
+package com.te6lim.c2candroidassessment.repository
 
 import com.te6lim.c2candroidassessment.network.NetworkExhibit
 

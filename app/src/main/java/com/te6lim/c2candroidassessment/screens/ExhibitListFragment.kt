@@ -7,16 +7,13 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearSnapHelper
-import androidx.recyclerview.widget.SnapHelper
 import com.te6lim.c2candroidassessment.MainActivity
 import com.te6lim.c2candroidassessment.R
 import com.te6lim.c2candroidassessment.database.ExhibitDatabase
 import com.te6lim.c2candroidassessment.databinding.FragmentListExhibitBinding
-import com.te6lim.c2candroidassessment.model.RestExhibitLoader
 import com.te6lim.c2candroidassessment.network.ExhibitApi
-import com.te6lim.c2candroidassessment.network.ExhibitApiService
 import com.te6lim.c2candroidassessment.repository.ExhibitRepository
+import com.te6lim.c2candroidassessment.repository.LoadStateListener
 
 class ExhibitListFragment : Fragment() {
 
@@ -41,14 +38,15 @@ class ExhibitListFragment : Fragment() {
         networkStateScreens = getNetworkScreenList(binding)
 
         val exhibitDatabase = ExhibitDatabase.getInstance(requireContext())
-        val exhibitLoader = RestExhibitLoader(ExhibitApi, object : RestExhibitLoader.NetworkStateListener {
-            override fun onStateResolved(state: RestExhibitLoader.NetworkState) {
+
+        val loadStateListener = object : LoadStateListener {
+            override fun onStateResolved(state: ExhibitRepository.NetworkState) {
                 showScreenBasedOnNetworkState(state, networkStateScreens)
             }
-        })
+        }
 
         val viewModelProvider = ExhibitListViewModel.Factory(
-            ExhibitRepository(exhibitLoader, exhibitDatabase)
+            ExhibitRepository(ExhibitApi, exhibitDatabase, loadStateListener)
         )
 
         val viewModel = ViewModelProvider(this, viewModelProvider)[ExhibitListViewModel::class.java]
@@ -68,19 +66,19 @@ class ExhibitListFragment : Fragment() {
         return listOf(binding.loadingScreen, binding.retryScreen, binding.recyclerView)
     }
 
-    private fun showScreenBasedOnNetworkState(state: RestExhibitLoader.NetworkState, views: List<View>) {
+    private fun showScreenBasedOnNetworkState(state: ExhibitRepository.NetworkState, views: List<View>) {
         when (state) {
-            RestExhibitLoader.NetworkState.LOADING -> {
+            ExhibitRepository.NetworkState.LOADING -> {
                 views.forEach { it.visibility = View.GONE }
                 views.find { it == binding.loadingScreen }?.visibility = View.VISIBLE
             }
 
-            RestExhibitLoader.NetworkState.DONE -> {
+            ExhibitRepository.NetworkState.DONE -> {
                 views.forEach { it.visibility = View.GONE }
                 views.find { it == binding.recyclerView }?.visibility = View.VISIBLE
             }
 
-            RestExhibitLoader.NetworkState.ERROR -> {
+            ExhibitRepository.NetworkState.ERROR -> {
                 views.forEach { it.visibility = View.GONE }
                 views.find { it == binding.retryScreen }?.visibility = View.VISIBLE
             }
