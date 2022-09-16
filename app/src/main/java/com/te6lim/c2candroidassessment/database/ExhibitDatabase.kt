@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
 
-@Database(entities = [Exhibit::class], version = 1, exportSchema = true)
+@Database(entities = [DBExhibit::class], version = 1, exportSchema = true)
 @TypeConverters(ImageListConverter::class)
 abstract class ExhibitDatabase : RoomDatabase() {
 
@@ -30,17 +30,17 @@ abstract class ExhibitDatabase : RoomDatabase() {
 interface ExhibitDao {
 
     @Query("SELECT * FROM exhibit")
-    fun getAll(): LiveData<List<Exhibit>>
+    fun getAll(): LiveData<List<DBExhibit>?>
 
     @Insert
-    fun addAll(list: List<Exhibit>): List<Long>
+    suspend fun addAll(list: List<DBExhibit>): List<Long>
 
     @Query("DELETE FROM exhibit")
-    fun clear()
+    suspend fun clear()
 }
 
 @Entity(tableName = "exhibit")
-data class Exhibit(
+data class DBExhibit(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     @ColumnInfo val title: String? = null,
     @ColumnInfo val images: List<String>? = null

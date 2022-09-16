@@ -39,9 +39,9 @@ class ExhibitListAdapter : ListAdapter<Exhibit, ExhibitListAdapter.ExhibitViewHo
             fun newAdapter() = ExhibitItemListAdapter()
         }
 
-        fun bind(exhibit: Exhibit) {
-            itemExhibitBinding.titleHead.text = exhibit.title
-            (itemExhibitBinding.recyclerView.adapter as ExhibitItemListAdapter).submitList(exhibit.images)
+        fun bind(Exhibit: Exhibit) {
+            itemExhibitBinding.titleHead.text = Exhibit.title
+            (itemExhibitBinding.recyclerView.adapter as ExhibitItemListAdapter).submitList(Exhibit.images)
         }
     }
 

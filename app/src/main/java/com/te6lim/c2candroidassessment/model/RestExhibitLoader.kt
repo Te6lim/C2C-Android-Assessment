@@ -1,6 +1,7 @@
 package com.te6lim.c2candroidassessment.model
 
 import com.te6lim.c2candroidassessment.network.ExhibitApi
+import com.te6lim.c2candroidassessment.network.NetworkExhibit
 import java.lang.Exception
 
 class RestExhibitLoader(
@@ -11,7 +12,7 @@ class RestExhibitLoader(
         DONE, LOADING, ERROR
     }
 
-    override suspend fun getExhibitList(): List<Exhibit> {
+    override suspend fun getExhibitList(): List<NetworkExhibit> {
         return try {
             networkStateListener.onStateResolved(NetworkState.LOADING)
             val response = network.retrofitService.getExhibitsAsync().await()

@@ -11,10 +11,12 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.SnapHelper
 import com.te6lim.c2candroidassessment.MainActivity
 import com.te6lim.c2candroidassessment.R
+import com.te6lim.c2candroidassessment.database.ExhibitDatabase
 import com.te6lim.c2candroidassessment.databinding.FragmentListExhibitBinding
 import com.te6lim.c2candroidassessment.model.RestExhibitLoader
 import com.te6lim.c2candroidassessment.network.ExhibitApi
 import com.te6lim.c2candroidassessment.network.ExhibitApiService
+import com.te6lim.c2candroidassessment.repository.ExhibitRepository
 
 class ExhibitListFragment : Fragment() {
 
@@ -38,12 +40,15 @@ class ExhibitListFragment : Fragment() {
 
         networkStateScreens = getNetworkScreenList(binding)
 
+        val exhibitDatabase = ExhibitDatabase.getInstance(requireContext())
+        val exhibitLoader = RestExhibitLoader(ExhibitApi, object : RestExhibitLoader.NetworkStateListener {
+            override fun onStateResolved(state: RestExhibitLoader.NetworkState) {
+                showScreenBasedOnNetworkState(state, networkStateScreens)
+            }
+        })
+
         val viewModelProvider = ExhibitListViewModel.Factory(
-            RestExhibitLoader(ExhibitApi, object : RestExhibitLoader.NetworkStateListener {
-                override fun onStateResolved(state: RestExhibitLoader.NetworkState) {
-                    showScreenBasedOnNetworkState(state, networkStateScreens)
-                }
-            })
+            ExhibitRepository(exhibitLoader, exhibitDatabase)
         )
 
         val viewModel = ViewModelProvider(this, viewModelProvider)[ExhibitListViewModel::class.java]
