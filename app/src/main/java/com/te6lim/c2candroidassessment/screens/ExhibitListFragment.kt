@@ -23,9 +23,7 @@ class ExhibitListFragment : Fragment() {
     private lateinit var networkStateScreens: List<View>
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_list_exhibit, container, false
