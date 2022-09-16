@@ -22,6 +22,8 @@ class ExhibitRepository(
 
     val exhibitList = fetchList(dbExhibits, networkData)
 
+    private var initialLoad = true
+
     enum class NetworkState {
         DONE, LOADING, ERROR
     }
@@ -29,7 +31,7 @@ class ExhibitRepository(
     override suspend fun getExhibitList(): List<NetworkExhibit> {
         return try {
             loadStateListener.onStateResolved(NetworkState.LOADING)
-            val response = getNetworkExhibitList()
+            val response = network.retrofitService.getExhibitsAsync().await()
             loadStateListener.onStateResolved(NetworkState.DONE)
             response
         } catch (e: Exception) {
@@ -43,21 +45,30 @@ class ExhibitRepository(
     ): LiveData<List<DBExhibit>> {
         val result = MediatorLiveData<List<DBExhibit>>()
 
-        val dbObserver = Observer<List<DBExhibit>?> {
+        val dbObserver = Observer<List<DBExhibit>> {
             if (it.isNotEmpty()) {
-                loadStateListener.onStateResolved(NetworkState.DONE)
-                result.value = it
-            } else {
-                scope.launch {
-                    networkData.postValue(getNetworkExhibitList())
+                if (initialLoad) {
+                    postNetworkData(networkData)
+                } else {
+                    loadStateListener.onStateResolved(NetworkState.DONE)
+                    result.value = it
                 }
+            } else {
+                postNetworkData(networkData)
             }
         }
 
         val networkObserver = Observer<List<NetworkExhibit>> {
             scope.launch {
+                initialLoad = false
                 if (it.isNotEmpty()) {
+                    exhibitDatabase.exhibitDao.clear()
                     exhibitDatabase.exhibitDao.addAll(it.toDatabaseExhibitList())
+                    result.removeSource(networkData)
+                } else {
+                    if (dbData.value!!.isNotEmpty()) loadStateListener.onStateResolved(NetworkState.DONE)
+                    else loadStateListener.onStateResolved(NetworkState.ERROR)
+                    result.value = dbData.value
                 }
             }
         }
@@ -67,16 +78,18 @@ class ExhibitRepository(
         return result
     }
 
-    private suspend fun getNetworkExhibitList(): List<NetworkExhibit> {
-        return network.retrofitService.getExhibitsAsync().await()
+    private fun postNetworkData(networkData: MutableLiveData<List<NetworkExhibit>>) {
+        scope.launch {
+            val list = getExhibitList()
+            networkData.postValue(list)
+        }
     }
 
     fun refreshList() {
         scope.launch {
-            withContext(Dispatchers.IO) {
-                exhibitDatabase.exhibitDao.clear()
-                networkData.value = getNetworkExhibitList()
-            }
+            exhibitDatabase.exhibitDao.clear()
+            val list = getExhibitList()
+            networkData.value = list
         }
 
     }
