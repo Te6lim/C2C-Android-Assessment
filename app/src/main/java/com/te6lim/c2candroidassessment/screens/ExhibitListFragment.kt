@@ -20,6 +20,8 @@ class ExhibitListFragment : Fragment() {
 
     private lateinit var binding: FragmentListExhibitBinding
 
+    private lateinit var networkStateScreens: List<View>
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,13 +38,49 @@ class ExhibitListFragment : Fragment() {
         val adapter = ExhibitListAdapter()
         binding.recyclerView.adapter = adapter
 
-        val viewModelProvider = ExhibitListViewModel.Factory(RestExhibitLoader(ExhibitApi))
+        networkStateScreens = getNetworkScreenList(binding)
+
+        val viewModelProvider = ExhibitListViewModel.Factory(
+            RestExhibitLoader(ExhibitApi, object : RestExhibitLoader.NetworkStateListener {
+                override fun onStateResolved(state: RestExhibitLoader.NetworkState) {
+                    showScreenBasedOnNetworkState(state, networkStateScreens)
+                }
+            })
+        )
+
         val viewModel = ViewModelProvider(this, viewModelProvider)[ExhibitListViewModel::class.java]
+
+        binding.retry.setOnClickListener {
+            viewModel.refreshList()
+        }
 
         viewModel.exhibitList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 
         return binding.root
+    }
+
+    private fun getNetworkScreenList(binding: FragmentListExhibitBinding): List<View> {
+        return listOf(binding.loadingScreen, binding.retryScreen, binding.recyclerView)
+    }
+
+    private fun showScreenBasedOnNetworkState(state: RestExhibitLoader.NetworkState, views: List<View>) {
+        when (state) {
+            RestExhibitLoader.NetworkState.LOADING -> {
+                views.forEach { it.visibility = View.GONE }
+                views.find { it == binding.loadingScreen }?.visibility = View.VISIBLE
+            }
+
+            RestExhibitLoader.NetworkState.DONE -> {
+                views.forEach { it.visibility = View.GONE }
+                views.find { it == binding.recyclerView }?.visibility = View.VISIBLE
+            }
+
+            RestExhibitLoader.NetworkState.ERROR -> {
+                views.forEach { it.visibility = View.GONE }
+                views.find { it == binding.retryScreen }?.visibility = View.VISIBLE
+            }
+        }
     }
 }

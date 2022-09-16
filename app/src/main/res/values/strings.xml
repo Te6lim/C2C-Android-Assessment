@@ -2,4 +2,7 @@
     <string name="app_name">Exhibits</string>
     <string name="exhibit_list">exhibit list</string>
     <string name="toolbar">Toolbar</string>
+    <string name="loading">loading</string>
+    <string name="unable_to_conect_please_retry">Unable to conect. Please retry</string>
+    <string name="retry">retry</string>
 </resources>

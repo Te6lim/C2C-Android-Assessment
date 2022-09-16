@@ -10,6 +10,6 @@
     <color name="secondaryTextColor">#ffffff</color>
 
     <color name="backgroundColor">#000000</color>
-    <color name="image_item_stroke_color">#303030</color>
+    <color name="image_item_stroke_color">@color/primaryLightColor</color>
 
 </resources>
