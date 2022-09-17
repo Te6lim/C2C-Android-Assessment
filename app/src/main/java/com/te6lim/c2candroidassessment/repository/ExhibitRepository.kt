@@ -41,9 +41,7 @@ class ExhibitRepository(
         if (it.isNotEmpty()) {
             if (initialLoad) postNetworkLiveData(networkData)
             else result.value = it
-        } else {
-            postNetworkLiveData(networkData)
-        }
+        } else postNetworkLiveData(networkData)
     }
 
     private fun getNetworkObserver(
@@ -56,7 +54,7 @@ class ExhibitRepository(
                 databaseLoader.addAllExhibits(it.toDBExhibitList())
                 dbData.postValue(databaseLoader.getExhibitList())
 
-            } else result.value = dbData.value
+            } else result.value = databaseLoader.getExhibitList()
         }
     }
 
