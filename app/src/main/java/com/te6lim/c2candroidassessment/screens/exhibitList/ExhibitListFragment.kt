@@ -1,7 +1,10 @@
 package com.te6lim.c2candroidassessment.screens.exhibitList
 
+import android.animation.ObjectAnimator
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -15,6 +18,7 @@ import com.te6lim.c2candroidassessment.databinding.FragmentListExhibitBinding
 import com.te6lim.c2candroidassessment.network.ExhibitApi
 import com.te6lim.c2candroidassessment.network.RestExhibitLoader
 import com.te6lim.c2candroidassessment.repository.ExhibitRepository
+import com.te6lim.c2candroidassessment.repository.LoadSource
 import com.te6lim.c2candroidassessment.repository.LoadState
 import com.te6lim.c2candroidassessment.repository.LoadStateListener
 
@@ -23,6 +27,8 @@ class ExhibitListFragment : Fragment() {
     private lateinit var binding: FragmentListExhibitBinding
 
     private lateinit var networkStateScreens: List<View>
+
+    private lateinit var loadIndicatorAnimator: ObjectAnimator
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -35,10 +41,16 @@ class ExhibitListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
+        loadIndicatorAnimator = getLoadIndicatorAnimator()
+
         val loadStateListener = object : LoadStateListener {
 
-            override fun onStateResolved(state: LoadState) {
+            override fun onStateResolved(state: LoadState, source: LoadSource) {
                 showScreenBasedOnNetworkState(state, networkStateScreens)
+
+                val pair = getResourcePairForLoadIndicator(source)
+
+                startAnimationByState(state, pair.first, pair.second)
             }
 
             override fun onRefresh(success: Boolean) {
@@ -90,6 +102,52 @@ class ExhibitListFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun startAnimationByState(
+        state: LoadState,
+        resource: Drawable?,
+        string: String
+    ) {
+        when (state) {
+            LoadState.LOADING -> {
+
+                binding.loadStateImage.setImageDrawable(resource)
+                binding.loadText.text = string
+                with(loadIndicatorAnimator) {
+                    end()
+                    start()
+                }
+            }
+            else -> {}
+        }
+    }
+
+    private fun getResourcePairForLoadIndicator(source: LoadSource): Pair<Drawable?, String> {
+        val image: Drawable
+        val text: String
+        when (source) {
+            LoadSource.NETWORK -> {
+                image = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_online)!!
+                text = requireContext().getString(R.string.loading_from_network)
+            }
+
+            LoadSource.DATABASE -> {
+                image = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_offline)!!
+                text = requireContext().getString(R.string.loading_from_database)
+            }
+        }
+        return Pair(image, text)
+    }
+
+    private fun getLoadIndicatorAnimator(): ObjectAnimator {
+        return ObjectAnimator.ofFloat(
+            binding.loadingIndicator, View.ALPHA, 0.6f
+        ).apply {
+            repeatCount = 1
+            repeatMode = ObjectAnimator.REVERSE
+            duration = 2000
+        }
     }
 
     private fun getNetworkScreenList(binding: FragmentListExhibitBinding): List<View> {

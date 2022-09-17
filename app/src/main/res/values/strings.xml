@@ -6,4 +6,7 @@
     <string name="unable_to_connect_please_retry">Unable to connect. Please retry</string>
     <string name="retry">retry</string>
     <string name="refresh">Refresh</string>
+
+    <string name="loading_from_network">Loading from network…</string>
+    <string name="loading_from_database">Loading offline data…</string>
 </resources>

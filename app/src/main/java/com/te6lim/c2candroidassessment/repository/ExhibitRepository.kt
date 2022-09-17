@@ -52,7 +52,7 @@ class ExhibitRepository(
             if (it.isNotEmpty()) {
                 databaseLoader.clearExhibitList()
                 databaseLoader.addAllExhibits(it.toDBExhibitList())
-                dbData.postValue(databaseLoader.getExhibitList())
+                result.value = it
 
             } else result.value = databaseLoader.getExhibitList()
         }
