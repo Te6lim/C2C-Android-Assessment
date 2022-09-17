@@ -53,7 +53,7 @@ class ExhibitListFragment : Fragment() {
                 startAnimationByState(state, pair.first, pair.second)
             }
 
-            override fun onRefresh(success: Boolean) {
+            override fun onRefresh(isSuccess: Boolean) {
                 binding.swipeRefresh.isRefreshing = false
             }
         }
@@ -142,7 +142,7 @@ class ExhibitListFragment : Fragment() {
 
     private fun getLoadIndicatorAnimator(): ObjectAnimator {
         return ObjectAnimator.ofFloat(
-            binding.loadingIndicator, View.ALPHA, 0.6f
+            binding.loadingIndicator, View.ALPHA, 1f
         ).apply {
             repeatCount = 1
             repeatMode = ObjectAnimator.REVERSE

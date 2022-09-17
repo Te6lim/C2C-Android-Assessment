@@ -4,5 +4,5 @@ interface LoadStateListener {
 
     fun onStateResolved(state: LoadState, source: LoadSource)
 
-    fun onRefresh(success: Boolean)
+    fun onRefresh(isSuccess: Boolean)
 }
