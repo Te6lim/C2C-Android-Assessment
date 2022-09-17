@@ -1,4 +1,4 @@
-package com.te6lim.c2candroidassessment.screens
+package com.te6lim.c2candroidassessment.screens.exhibitList
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

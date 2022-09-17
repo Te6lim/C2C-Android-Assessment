@@ -1,11 +1,11 @@
-package com.te6lim.c2candroidassessment.screens
+package com.te6lim.c2candroidassessment.screens.exhibitList
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.te6lim.c2candroidassessment.MainActivity
 import com.te6lim.c2candroidassessment.R
@@ -35,25 +35,47 @@ class ExhibitListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
-        val adapter = ExhibitListAdapter()
-        binding.recyclerView.adapter = adapter
-
-        networkStateScreens = getNetworkScreenList(binding)
-
-        val exhibitDatabase = ExhibitDatabase.getInstance(requireContext())
-
         val loadStateListener = object : LoadStateListener {
+
             override fun onStateResolved(state: LoadState) {
                 showScreenBasedOnNetworkState(state, networkStateScreens)
             }
+
+            override fun onRefresh(success: Boolean) {
+                binding.swipeRefresh.isRefreshing = false
+            }
         }
+
+        val exhibitDatabase = ExhibitDatabase.getInstance(requireContext())
 
         val networkLoader = RestExhibitLoader(ExhibitApi, loadStateListener)
         val databaseLoader = DatabaseExhibitLoader(exhibitDatabase, loadStateListener)
 
         val viewModelProvider = ExhibitListViewModel.Factory(ExhibitRepository(networkLoader, databaseLoader))
 
-        val viewModel = ViewModelProvider(this, viewModelProvider)[ExhibitListViewModel::class.java]
+        val viewModel = ViewModelProvider(this, viewModelProvider)[ExhibitListViewModel::class.java].apply {
+            binding.swipeRefresh.isRefreshing = true
+        }
+
+        val adapter = ExhibitListAdapter()
+        binding.recyclerView.adapter = adapter
+
+        networkStateScreens = getNetworkScreenList(binding)
+
+        val menuProvider = object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.exhibit_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.refresh -> viewModel.refreshList()
+                }
+                return true
+            }
+        }
+
+        requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         binding.retry.setOnClickListener {
             viewModel.refreshList()
@@ -61,6 +83,10 @@ class ExhibitListFragment : Fragment() {
 
         viewModel.exhibitList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
+        }
+
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.refreshList()
         }
 
         return binding.root

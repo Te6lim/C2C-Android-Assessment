@@ -5,4 +5,5 @@
     <string name="loading">loading</string>
     <string name="unable_to_connect_please_retry">Unable to connect. Please retry</string>
     <string name="retry">retry</string>
+    <string name="refresh">Refresh</string>
 </resources>

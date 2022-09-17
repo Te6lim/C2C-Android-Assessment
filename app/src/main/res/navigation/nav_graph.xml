@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/exhibitListFragment"
-        android:name="com.te6lim.c2candroidassessment.screens.ExhibitListFragment"
+        android:name="com.te6lim.c2candroidassessment.screens.exhibitList.ExhibitListFragment"
         android:label="fragment_list_exhibit"
         tools:layout="@layout/fragment_list_exhibit" />
 </navigation>

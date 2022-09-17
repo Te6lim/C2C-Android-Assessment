@@ -1,16 +1,12 @@
-package com.te6lim.c2candroidassessment.screens
+package com.te6lim.c2candroidassessment.screens.exhibitList
 
 import androidx.lifecycle.*
 import com.te6lim.c2candroidassessment.model.Exhibit
 import com.te6lim.c2candroidassessment.repository.ExhibitRepository
 
-class ExhibitListViewModel(val exhibitRepository: ExhibitRepository) : ViewModel() {
+class ExhibitListViewModel(private val exhibitRepository: ExhibitRepository) : ViewModel() {
 
-    val exhibitList = Transformations.map(exhibitRepository.exhibitList) {
-        it.map { exhibit ->
-            Exhibit(title = exhibit.title!!, images = exhibit.images!!)
-        }
-    }
+    val exhibitList = exhibitRepository.exhibitList
 
     fun refreshList() {
         exhibitRepository.refreshList()

@@ -11,5 +11,6 @@
 
     <color name="backgroundColor">#000000</color>
     <color name="image_item_stroke_color">@color/primaryLightColor</color>
+    <color name="toolbarDividerColor">#5C5C5C</color>
 
 </resources>

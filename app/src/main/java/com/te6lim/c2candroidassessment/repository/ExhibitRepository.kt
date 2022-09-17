@@ -60,6 +60,7 @@ class ExhibitRepository(
 
     private fun postNetworkLiveData(networkData: MutableLiveData<List<Exhibit>>) {
         scope.launch {
+            if (initialLoad) networkLoader.isRefreshing = true
             val list = networkLoader.getExhibitList()
             networkData.postValue(list)
         }
@@ -68,6 +69,7 @@ class ExhibitRepository(
     fun refreshList() {
         scope.launch {
             databaseLoader.clearExhibitList()
+            networkLoader.isRefreshing = true
             val list = networkLoader.getExhibitList()
             networkData.value = list
         }
