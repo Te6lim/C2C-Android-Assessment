@@ -1,3 +1,3 @@
 package com.te6lim.c2candroidassessment.model
 
-data class Exhibit(val title: String, val images: List<String>)
+open class Exhibit(open val title: String?, open val images: List<String>?)

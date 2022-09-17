@@ -3,6 +3,7 @@ package com.te6lim.c2candroidassessment.database
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.te6lim.c2candroidassessment.model.Exhibit
 
 @Database(entities = [DBExhibit::class], version = 1, exportSchema = true)
 @TypeConverters(ImageListConverter::class)
@@ -42,6 +43,6 @@ interface ExhibitDao {
 @Entity(tableName = "exhibit")
 data class DBExhibit(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-    @ColumnInfo val title: String? = null,
-    @ColumnInfo val images: List<String>? = null
-)
+    @ColumnInfo override val title: String? = null,
+    @ColumnInfo override val images: List<String>? = null
+) : Exhibit(title, images)
