@@ -30,12 +30,12 @@ class ExhibitRepository(
 
         val result = MediatorLiveData<List<Exhibit>>()
 
-        result.addSource(dbData, getDatabaseObserver(networkData, result))
-        result.addSource(networkData, getNetworkObserver(dbData, result))
+        result.addSource(dbData, onLocalDataChange(networkData, result))
+        result.addSource(networkData, onNetworkDataChange(result))
         return result
     }
 
-    private fun getDatabaseObserver(
+    private fun onLocalDataChange(
         networkData: MutableLiveData<List<Exhibit>>, result: MediatorLiveData<List<Exhibit>>
     ) = Observer<List<Exhibit>> {
         if (it.isNotEmpty()) {
@@ -44,9 +44,7 @@ class ExhibitRepository(
         } else postNetworkLiveData(networkData)
     }
 
-    private fun getNetworkObserver(
-        dbData: MutableLiveData<List<Exhibit>>, result: MediatorLiveData<List<Exhibit>>
-    ) = Observer<List<Exhibit>> {
+    private fun onNetworkDataChange(result: MediatorLiveData<List<Exhibit>>) = Observer<List<Exhibit>> {
         scope.launch {
             initialLoad = false
             if (it.isNotEmpty()) {

@@ -43,20 +43,7 @@ class ExhibitListFragment : Fragment() {
 
         loadIndicatorAnimator = getLoadIndicatorAnimator()
 
-        val loadStateListener = object : LoadStateListener {
-
-            override fun onStateResolved(state: LoadState, source: LoadSource) {
-                showScreenBasedOnNetworkState(state, networkStateScreens)
-
-                val pair = getResourcePairForLoadIndicator(source)
-
-                startAnimationByState(state, pair.first, pair.second)
-            }
-
-            override fun onRefresh(isSuccess: Boolean) {
-                binding.swipeRefresh.isRefreshing = false
-            }
-        }
+        val loadStateListener = loadStateListener()
 
         val exhibitDatabase = ExhibitDatabase.getInstance(requireContext())
 
@@ -74,18 +61,7 @@ class ExhibitListFragment : Fragment() {
 
         networkStateScreens = getNetworkScreenList(binding)
 
-        val menuProvider = object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.exhibit_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                when (menuItem.itemId) {
-                    R.id.refresh -> viewModel.refreshList()
-                }
-                return true
-            }
-        }
+        val menuProvider = menuProvider(viewModel)
 
         requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
@@ -104,14 +80,38 @@ class ExhibitListFragment : Fragment() {
         return binding.root
     }
 
-    private fun startAnimationByState(
-        state: LoadState,
-        resource: Drawable?,
-        string: String
-    ) {
+    private fun loadStateListener() = object : LoadStateListener {
+
+        override fun onStateResolved(state: LoadState, source: LoadSource) {
+            showScreenBasedOnNetworkState(state, networkStateScreens)
+
+            val pair = getResourcePairForLoadIndicator(source)
+
+            startAnimationByState(state, pair.first, pair.second)
+        }
+
+        override fun onRefresh(isSuccess: Boolean) {
+            binding.swipeRefresh.isRefreshing = false
+        }
+    }
+
+    private fun menuProvider(viewModel: ExhibitListViewModel) =
+        object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.exhibit_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.refresh -> viewModel.refreshList()
+                }
+                return true
+            }
+        }
+
+    private fun startAnimationByState(state: LoadState, resource: Drawable?, string: String) {
         when (state) {
             LoadState.LOADING -> {
-
                 binding.loadStateImage.setImageDrawable(resource)
                 binding.loadText.text = string
                 with(loadIndicatorAnimator) {

@@ -26,23 +26,3 @@ abstract class ExhibitDatabase : RoomDatabase() {
         }
     }
 }
-
-@Dao
-interface ExhibitDao {
-
-    @Query("SELECT * FROM exhibit")
-    suspend fun getAll(): List<DBExhibit>
-
-    @Insert
-    suspend fun addAll(list: List<DBExhibit>): List<Long>
-
-    @Query("DELETE FROM exhibit")
-    suspend fun clear()
-}
-
-@Entity(tableName = "exhibit")
-data class DBExhibit(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-    @ColumnInfo override val title: String? = null,
-    @ColumnInfo override val images: List<String>? = null
-) : Exhibit(title, images)
