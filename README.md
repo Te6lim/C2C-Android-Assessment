@@ -1,11 +1,14 @@
 # C2C-Android-Assessment
 
-#Description
+# Description
 Pulls list of exhbit from a network and displays them on screen
 
 # Preview
 
-https://user-images.githubusercontent.com/57777459/190915404-d0adc75d-35a9-4ad7-b247-977daed30259.mp4
+
+https://user-images.githubusercontent.com/57777459/190915996-478b1e5f-9c70-4743-9367-a782dc80d4fd.mp4
+
+
 
 # Features
 * Supports offline caching
